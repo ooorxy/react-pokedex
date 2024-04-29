@@ -14,7 +14,7 @@ export default function PokemonCard({item, index}: { item: PokemonInfo, index: n
         setPokemon(response);
     }
 
-    const stringToUppercase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+    const stringFirstCharToUppercase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
     useEffect(() => {
         setTimeout(() => {
@@ -27,10 +27,11 @@ export default function PokemonCard({item, index}: { item: PokemonInfo, index: n
             {!pokemon ? <Loading width={120} height={120}/> :
                 <>
                     <CardHeader className="text-center text-[1.325rem]">
-                        <span className="badge">{stringToUppercase(pokemon.name)}</span>
+                        <span className="badge">{stringFirstCharToUppercase(pokemon.name)}</span>
                     </CardHeader>
                     <CardContent className="flex justify-center">
                         <Image src={pokemon.sprites.other["official-artwork"].front_default}
+                               priority={false}
                                height={120}
                                width={120}
                                alt={pokemon.name}
@@ -39,7 +40,7 @@ export default function PokemonCard({item, index}: { item: PokemonInfo, index: n
                     <CardFooter className="flex flex-row justify-around">
                         {pokemon.types.map((type, i) =>
                             <span key={i + pokemon.order + type.type.name} className={`badge ${type.type.name}-bg`}>
-                                {stringToUppercase(type.type.name)}
+                                {stringFirstCharToUppercase(type.type.name)}
                             </span>
                         )}
                     </CardFooter>

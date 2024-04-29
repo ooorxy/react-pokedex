@@ -48,9 +48,9 @@ export default function RootLayout({
             </div>
           </header>
           <main>
-            <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+            <section className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8 space-y-6">
               {children}
-            </div>
+            </section>
           </main>
         </div>
       </body>
