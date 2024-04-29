@@ -6,7 +6,7 @@ import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card";
 import Loading from "@/components/pokemons/Loading";
 import Image from "next/image";
 
-export default function PokemonCard({item}: { item: PokemonInfo }) {
+export default function PokemonCard({item, index}: { item: PokemonInfo, index: number }) {
     const [pokemon, setPokemon] = useState<Pokemon | null>(null);
     const fetchPokemon = async () => {
         const response = await FetchPokemon(item.url);
@@ -17,11 +17,13 @@ export default function PokemonCard({item}: { item: PokemonInfo }) {
     const stringToUppercase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
     useEffect(() => {
-        fetchPokemon();
+        setTimeout(() => {
+            fetchPokemon();
+        }, 500 * index);
     }, []);
 
     return <div className="flex justify-center">
-        <Card className={`card-pokemon text-gray-500 ${pokemon ? `${pokemon.types[0].type.name}-bg` : ''}`}>
+        <Card className={`card-pokemon text-gray-500 ${pokemon ? `${pokemon.types[0].type.name}-bg` : 'flex justify-center items-center'}`}>
             {!pokemon ? <Loading width={120} height={120}/> :
                 <>
                     <CardHeader className="text-center text-[1.325rem]">

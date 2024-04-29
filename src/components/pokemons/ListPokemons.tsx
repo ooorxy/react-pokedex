@@ -28,6 +28,25 @@ export default function ListPokemons() {
     });
 
     const [pagination, setPagination] = useState<number[]>([]);
+    const qtdPages = Math.ceil(1302 / 12);
+    const paginationArr = Array.from({ length: qtdPages }, (_, index) => index);
+
+    const buttonClick = (pageNumber: number, nextPage: string | null) => {
+        if (pageNumber === 0) {
+            return;
+        }
+
+        setForm((prev) => {
+            let newPage = prev.page + pageNumber;
+            if (newPage < 0) {
+                newPage = 0;
+            }
+
+            return {...prev, page: newPage};
+        });
+
+        fetchPokemons(nextPage).then();
+    }
 
     const fetchPokemons = async (url: string | null = null) => {
         try {
@@ -41,22 +60,6 @@ export default function ListPokemons() {
                 });
             }
 
-            if (!pagination.length) {
-                const qtd = Math.ceil(response.count / 12);
-                const pagination = Array.from({ length: qtd }, (_, index) => index + 1);
-                setPagination(prev => {
-                    const paginasExibidas = pagination.slice(
-                        Math.max(0, (form.page - 1) - 2),
-                        Math.min(qtd, (form.page - 1) + 1)
-                    );
-                    console.log(paginasExibidas, pagination, form.page);
-
-                    return [];
-                })
-
-                // Calcula as páginas a serem exibidas com base na página atual
-
-            }
             setList(response.results);
             setPages({
                 previous: response.previous,
@@ -77,7 +80,11 @@ export default function ListPokemons() {
     };
 
     useEffect(() => {
-        fetchPokemons();
+        fetchPokemons().then();
+    }, []);
+
+    useEffect(() => {
+        setPagination(paginationArr.slice(Math.max(0, (form.page - 1) - 1), Math.min(qtdPages, (form.page - 1) + 2)));
     }, [form.page]);
 
     return (
@@ -103,36 +110,35 @@ export default function ListPokemons() {
                     </Button>
                 </div>
             </div>
+            <p className="pokeball"></p>
 
-            <div className="flex justify-around md:justify-between">
-                {/*<Button size="lg" variant="destructive" disabled={!pages.previous}*/}
-                {/*        onClick={() => fetchPokemons(pages.previous)}>*/}
-                {/*    <ArrowLeft/>*/}
-                {/*</Button>*/}
-                {/*<Button size="lg" variant="destructive" disabled={!pages.next}*/}
-                {/*        onClick={() => fetchPokemons(pages.next)}>*/}
-                {/*    <ArrowRight/>*/}
-                {/*</Button>*/}
+            <div className="flex justify-center">
                 <Pagination>
                     <PaginationContent>
                         <PaginationItem>
-                            <PaginationPrevious href="#" onClick={() => fetchPokemons(pages.previous)}/>
+                            <PaginationPrevious href="#" onClick={() => buttonClick(-1, pages.previous)}/>
                         </PaginationItem>
-
+                        {
+                            pagination.map((page: number) => {
+                                return <PaginationItem key={page}>
+                                    <PaginationLink isActive={page === form.page} href="#" onClick={() => buttonClick(page - form.page, `https://pokeapi.co/api/v2/pokemon/?offset=${page}&limit=12`)}>{page}</PaginationLink>
+                                </PaginationItem>;
+                            })
+                        }
                         <PaginationItem>
                             <PaginationEllipsis/>
                         </PaginationItem>
                         <PaginationItem>
-                            <PaginationNext href="#" onClick={() => fetchPokemons(pages.next)}/>
+                            <PaginationNext href="#" onClick={() => buttonClick(+1, pages.next)}/>
                         </PaginationItem>
                     </PaginationContent>
                 </Pagination>
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className={`gap-4 justify-center ${list.length ? 'grid sm:grid-cols-3' : 'flex'}`}>
                 {list.length ? (
                     list.map((pokemon, index) => {
-                        return <PokemonCard key={index} item={pokemon}/>
+                        return <PokemonCard key={index} item={pokemon} index={index}/>
                     })
                 ) : (
                     <Loading height={120} width={120}/>
